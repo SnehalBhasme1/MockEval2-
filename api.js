@@ -1,4 +1,4 @@
-const BASE_URL = "https://your-json-server-link/questions/";
+const BASE_URL = "https://mountain-harvest-shop.glitch.me";
 
 // Add Question
 document.getElementById("quizForm").addEventListener("submit", async function (event) {
