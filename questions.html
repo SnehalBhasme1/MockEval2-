@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reviewed Questions</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        .question-card {
+            border: 2px solid violet;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <nav>
@@ -12,8 +18,41 @@
         <a href="quiz.html">Quiz</a>
         <a href="questions.html">Questions</a>
     </nav>
-    <h1>Reviewed Questions</h1>
-    <div id="reviewed-questions-container"></div>
-    <script src="script.js"></script>
+
+    <h3>Reviewed Questions</h3>
+    <div id="questionsContainer"></div>
+
+    <script>
+        const BASE_URL = "https://mountain-harvest-shop.glitch.me/api/questions/";
+
+        // Fetch and render reviewed questions
+        async function fetchReviewedQuestions() {
+            const response = await fetch(BASE_URL);
+            const questions = await response.json();
+            const reviewedQuestions = questions.filter(q => q.reviewStatus === true);
+            renderQuestions(reviewedQuestions);
+        }
+
+        // Render Questions
+        function renderQuestions(questions) {
+            const container = document.getElementById("questionsContainer");
+            container.innerHTML = "";
+            questions.forEach((q) => {
+                const card = document.createElement("div");
+                card.className = "question-card";
+                card.innerHTML = `
+                    <h3>${q.title}</h3>
+                    <p>A: ${q.optionA}</p>
+                    <p>B: ${q.optionB}</p>
+                    <p>C: ${q.optionC}</p>
+                    <p>D: ${q.optionD}</p>
+                    <p>Correct Answer: ${q.correctOption}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        fetchReviewedQuestions();
+    </script>
 </body>
 </html>
