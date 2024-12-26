@@ -1,0 +1,18 @@
+nav {
+    background-color: #f4f4f4;
+    padding: 10px;
+}
+nav a {
+    margin-right: 15px;
+    text-decoration: none;
+}
+.unreviewed {
+    border: 2px solid blue;
+    padding: 10px;
+    margin: 10px;
+}
+.reviewed {
+    border: 2px solid violet;
+    padding: 10px;
+    margin: 10px;
+}
