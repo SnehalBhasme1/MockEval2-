@@ -4,7 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Management</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        .question-card {
+            border: 2px solid;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .reviewed {
+            border-color: violet;
+        }
+        .unreviewed {
+            border-color: blue;
+        }
+    </style>
 </head>
 <body>
     <nav>
@@ -12,17 +24,101 @@
         <a href="quiz.html">Quiz</a>
         <a href="questions.html">Questions</a>
     </nav>
-    <h1>Quiz Management</h1>
-    <form id="quiz-form">
-        <label>Question Statement: <input type="text" id="question" required></label>
-        <label>Option A: <input type="text" id="optionA" required></label>
-        <label>Option B: <input type="text" id="optionB" required></label>
-        <label>Option C: <input type="text" id="optionC" required></label>
-        <label>Option D: <input type="text" id="optionD" required></label>
-        <label>Correct Option: <input type="text" id="correctOption" required></label>
+
+    <h2>Create New Question</h2>
+    <form id="quizForm">
+        <label for="question">Question:</label>
+        <input type="text" id="question" required><br>
+
+        <label for="optionA">Option A:</label>
+        <input type="text" id="optionA" required><br>
+
+        <label for="optionB">Option B:</label>
+        <input type="text" id="optionB" required><br>
+
+        <label for="optionC">Option C:</label>
+        <input type="text" id="optionC" required><br>
+
+        <label for="optionD">Option D:</label>
+        <input type="text" id="optionD" required><br>
+
+        <label for="correctOption">Correct Option (A/B/C/D):</label>
+        <input type="text" id="correctOption" required><br>
+
         <button type="submit">Add Question</button>
     </form>
-    <div id="questions-container"></div>
-    <script src="script.js"></script>
+
+    <h3>Existing Questions</h3>
+    <div id="questionsContainer"></div>
+
+    <script>
+        const BASE_URL = "https://mountain-harvest-shop.glitch.me/api/questions/";
+
+        // Add Question
+        document.getElementById("quizForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const questionData = {
+                title: document.getElementById("question").value,
+                optionA: document.getElementById("optionA").value,
+                optionB: document.getElementById("optionB").value,
+                optionC: document.getElementById("optionC").value,
+                optionD: document.getElementById("optionD").value,
+                correctOption: document.getElementById("correctOption").value,
+                reviewStatus: false,
+            };
+            await fetch(BASE_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(questionData),
+            });
+            alert("Question Created");
+            fetchQuestions();
+        });
+
+        // Fetch Questions
+        async function fetchQuestions() {
+            const response = await fetch(BASE_URL);
+            const questions = await response.json();
+            renderQuestions(questions);
+        }
+
+        // Render Questions
+        function renderQuestions(questions) {
+            const container = document.getElementById("questionsContainer");
+            container.innerHTML = "";
+            questions.forEach((q) => {
+                const card = document.createElement("div");
+                card.className = q.reviewStatus ? "reviewed" : "unreviewed";
+                card.innerHTML = `
+                    <h3>${q.title}</h3>
+                    <button onclick="reviewQuestion(${q.id})">Review Question</button>
+                    <button onclick="deleteQuestion(${q.id})">Delete Question</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Review Question
+        async function reviewQuestion(id) {
+            if (confirm("Are you sure to review the question?")) {
+                await fetch(`${BASE_URL}${id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ reviewStatus: true }),
+                });
+                fetchQuestions();
+            }
+        }
+
+        // Delete Question
+        async function deleteQuestion(id) {
+            if (confirm("Are you sure to delete?")) {
+                await fetch(`${BASE_URL}${id}`, { method: "DELETE" });
+                fetchQuestions();
+            }
+        }
+
+        fetchQuestions();
+    </script>
 </body>
 </html>
